@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaflet Map</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      #map {
+        height: 100vh; /* Full screen height */
+
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="map"></div>
+
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+
+	  </script>   
+	 <script>
+
+
+// Set up the map and center it on specific coordinates
+const map = L.map("map").setView([51.02884270593729, 4.355329104017556], 8) // Latitude, Longitude, Zoom level
+// Add OpenStreetMap tiles
+
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}).addTo(map);
+
+fetch("https://raw.githubusercontent.com/Zeger-VG/gemeenten_geojson/main/clustertest2.geojson")
+    .then(function(response) {
+        return response.json()
+    })
+    .then(function(data) {
+        L.geoJson(data).addTo(map);
+    })
+    .catch(function(error) {
+        console.log(`This is the error: ${error}`)
+    })		 
+
+//goeJSON laag kleuren
+
+		function getColor(cjb) {
+    	switch (cjb) {
+        case 'Antwerpen': return '#1f78b4';
+        case 'Mechelen': return '#33a02c';
+        case 'Turnhout': return '#e31a1c';
+		case 'Limburg': return '#ff7f00';
+        case 'Brussel': return '#6a3d9a';
+        case 'Leuven': return '#b15928';
+		case 'Gent': return '#a6cee3';
+        case 'Dendermonde': return '#b2df8a';
+        case 'Oudenaarde': return '#fb9a99';
+		case 'Brugge': return '#fdbf6f';
+        case 'Ieper': return '#cab2d6';
+        case 'Kortrijk': return '#ffff99';
+		case 'Veurne': return '#8dd3c7';
+    }
+}
+		 
+//goeJSON laag toevoegen
+		 
+fetch("https://raw.githubusercontent.com/Zeger-VG/gemeenten_geojson/main/clustertest2.geojson")
+    .then((response) => response.json())
+    .then((data) => {
+
+	// Add the GeoJSON layer with styles and popups
+        L.geoJson(data, {
+            style: function(feature) {
+                return {
+                    fillColor: getColor(feature.properties.CJB), // Use CJB to determine color
+					stroke: false,
+			        weight: 0,      // Ensure no border width is set
+					color: 'transparent',
+					fill: true,
+					interactive: true,
+					fillOpacity: 0.4
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                // Add a popup for each feature
+                layer.bindPopup(`
+                    ${feature.properties.NAAM}<br>
+                    <b>CJB ${feature.properties.CJB}</b>
+                `);
+				
+            }
+        }).addTo(map);
+	
+    })
+    .catch((error) => {
+        console.log(`This is the error: ${error}`);
+    }); 
+
+
+// Markers
+gevangenisantwerpen = L.marker([51.213222371225605, 4.40109329539191]).addTo(
+  map,
+)
+gevangenisantwerpen.bindPopup(
+  "<b>Gevangenis Antwerpen</b><br><br>Begijnenstraat 42, 2000 Antwerpen<br><a href='mailto: zegervangarsse@gmail.com'>zegervangarsse@gmail.com</a>",
+)
+
+gevangenisieper = L.marker([50.851875793180184, 2.878516081879565], {
+  color: "red",
+  fillColor: "#f03",
+  fillOpacity: 0.5,
+  radius: 200,
+}).addTo(map)
+gevangenisieper.bindPopup(
+   "<b>Gevangenis Ieper</b><br><br>Begijnenstraat 42, 2000 Antwerpen<br><a href='mailto: zegervangarsse@gmail.com'>zegervangarsse@gmail.com</a>",
+)
+
+    </script>
+  </body>
+</html>
